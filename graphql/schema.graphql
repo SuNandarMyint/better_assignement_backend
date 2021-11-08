@@ -1,0 +1,66 @@
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Query {
+    employees: [Employee!]! @all @guard(with: ["api"])
+    employeeDetail(id: Int! @eq): Employee @find @guard(with: ["api"])
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Mutation {
+    login(
+        input: LoginInput @spread
+    ): AuthPayload! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\Login@resolve")
+
+    createEmployee(
+        name: String!
+        phone_no: String!
+        email: String!
+        designation_id:Int!
+        department_id:Int!
+    ): String @field(resolver:"App\\GraphQL\\Mutations\\CreateEmployeeMutation") @guard(with: ["api"])
+
+    updateEmployee(
+        employee_id:Int!
+        name: String
+        phone_no: String
+        email: String
+        designation_id:Int
+        department_id:Int
+    ): String @field(resolver:"App\\GraphQL\\Mutations\\UpdateEmployeeMutation") @guard(with: ["api"])
+
+    deleteEmployee(
+        employee_id:Int!
+    ): String @field(resolver:"App\\GraphQL\\Mutations\\DeleteEmployeeMutation") @guard(with: ["api"])
+}
+
+type Employee {
+    id: ID!
+    name: String!
+    email: String!
+    phone_no: String!
+    designation: Designation @belongsTo
+    department: Department @belongsTo
+}
+
+type Designation {
+    id: ID!
+    name: String!
+}
+
+type Department {
+    id: ID!
+    name: String!
+}
+
+
